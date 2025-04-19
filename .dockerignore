@@ -1,0 +1,9 @@
+dist/
+.git
+node_modules/
+.env
+.env.*
+.gitignore
+.github/
+script/
+compose.yml

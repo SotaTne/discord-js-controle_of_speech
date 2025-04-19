@@ -1,0 +1,48 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  check_change:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      command: ${{ steps.changes.outputs.command }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            command:
+              - 'data/**'
+              - 'script/**'
+              - 'package.json'
+
+  register:
+    runs-on: ubuntu-latest
+    needs: check_change
+    if: needs.check_change.outputs.command == 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+      - name: set env
+        run: |
+          touch .env
+          echo DISCORD_APPLICATION_ID=${{ secrets.DISCORD_APPLICATION_ID }} >> .env
+          echo DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} >> .env
+
+      - name: Install dependencies
+        run: pnpm install
+      - name: register
+        run: pnpm register
