@@ -70,7 +70,7 @@ export async function setWord(
       .returning({
         id: baseWordTable.id,
       });
-    if (target && added.length > 0) {
+    if (target && added.length === 1) {
       const baseWordId = added[0].id;
       await tx
         .insert(targetWordTable)
@@ -81,7 +81,7 @@ export async function setWord(
           planeTargetWord: target.planeTargetWord,
         })
         .onConflictDoUpdate({
-          target: [targetWordTable.guildId, targetWordTable.baseWordId],
+          target: [targetWordTable.baseWordId],
           set: {
             targetWord: target.targetWord,
             planeTargetWord: target.planeTargetWord,

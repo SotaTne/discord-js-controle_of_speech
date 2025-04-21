@@ -4,7 +4,6 @@ import { commands } from "../data/commands.js";
 import { getRoles } from "./helper/roles.js";
 import { checkJWTRole } from "./helper/role-jwt-helper.js";
 import { getWords } from "./helper/database.js";
-import { ParsedWord } from "./helper/textParser.js";
 import { replaceText } from "./helper/replacer.js";
 
 const PORT = 8000;
@@ -65,14 +64,14 @@ client.on(Events.MessageCreate, async (message) => {
     const wordsPattern = await getWords(message.guild.id);
     const replaced = replaceText(wordsPattern, messageContent);
     await message.channel.send(
-      `精査済みのメッセージ\n ${replaced} \n送信者: <@${sender}>`
+      `---精査済みのメッセージ---\n ${replaced} \n---送信者: <@${sender}>---`
     );
   } catch (error) {
     console.error("Error checking JWT role:", error);
   }
 });
 
-process.on("unhandledRejection", (error) => {
+process.on(Events.Error, (error) => {
   console.error("Unhandled promise rejection:", error);
 });
 
